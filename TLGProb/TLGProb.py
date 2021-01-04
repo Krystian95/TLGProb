@@ -9,6 +9,7 @@ import sys, os
 import csv
 import numpy as np
 from SSGP import SSGP
+from scipy.sparse.linalg.isolve.tests.test_lsqr import n
 
 from .WrappedPredictor import WrappedPredictor
 
@@ -485,6 +486,7 @@ class TLGProb(object):
         return model_dir + "Team" + name + ".pkl"
 
     def get_player_model_path_by_pos(self, pos, regression_method="SSGPR", name=""):
+        #print("[get_player_model_path_by_pos] pos = "+pos+ ", regression_method = "+regression_method+", name = "+name)
         model_dir = self.model_path+regression_method+"/"
         if(name == ""):
             model_dir = model_dir
@@ -602,6 +604,7 @@ class TLGProb(object):
         return res
 
     def train_player_models(self, regression_method="SSGPR"):
+        #print("[train_player_models] regression_method = "+regression_method)
         import random
         print("Start Training Player Models......")
         data = self.get_player_models_dataset()
@@ -721,7 +724,13 @@ class TLGProb(object):
         self.train_regression(X, y, model_path, best_model_path, regression_method)
     
     def train_regression(self, X, y, model_path, best_model_path, regression_method):
+        #print("[train_regression] model_path = "+model_path+", best_model_path = "+best_model_path+", regression_method = "+regression_method)
+        #print("X = ")
+        #print(X)
+        #print("y = ")
+        #print(y)
         import glob
+        import random
         from sklearn.model_selection import GridSearchCV
         model_dir = '/'.join(model_path.split('/')[:-1])
         if not os.path.exists(model_dir):
@@ -823,7 +832,7 @@ class TLGProb(object):
             model.fit(X, y.ravel())
             model = model.best_estimator_
         model = WrappedPredictor(regression_method, model, X, y)
-        model.save(model_path)
+        model.save(model_path) # potrebbe dover essere messa dopo model.predict() alla riga successiva
         mse, nmse, mnlp = model.predict(X.copy(), y.copy())
         print("RESULT OF %s MODEL (%s):" % (regression_method, model.hashed_name))
         print("\tMSE = %.5f\n\tNMSE = %.5f\n\tMNLP = %.5f"%(mse, nmse, mnlp))

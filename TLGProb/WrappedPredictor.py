@@ -14,6 +14,7 @@ from SSGP import SSGP
 class WrappedPredictor(object):
     
     def __init__(self, regression_method="", predictor=None, X_train=None, y_train=None):
+        #print("[WrappedPredictor] regression_method = "+str(regression_method)+", predictor = "+str(predictor))
         self.regression_method = regression_method
         if(predictor is None):
             self.predictor = SSGP()
@@ -27,6 +28,7 @@ class WrappedPredictor(object):
             self.y_train = y_train
         
     def predict(self, X_test, y_test=None):
+        #print("[WrappedPredictor - predict]")
         if(self.regression_method == "SSGPR"):
             return self.predictor.predict(X_test, y_test)
         mu = self.predictor.predict(X_test)
@@ -41,6 +43,7 @@ class WrappedPredictor(object):
         return self.mse, self.nmse, self.mnlp
     
     def save(self, path):
+        #print("[WrappedPredictor - save] path = " + str(path))
         if(self.regression_method == "SSGPR"):
             self.predictor.save(path)
             return;

@@ -7,7 +7,8 @@
 
 import os
 import csv
-from sklearn.externals.six.moves import xrange
+#from sklearn.externals.six.moves import xrange
+from past.builtins import xrange
 from .bot import Bot
 
 class NBA_Bot(Bot):
