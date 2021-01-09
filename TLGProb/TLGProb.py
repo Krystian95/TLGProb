@@ -13,7 +13,12 @@ from scipy.sparse.linalg.isolve.tests.test_lsqr import n
 
 from .WrappedPredictor import WrappedPredictor
 
+# ADDED [!]
+from .CustomUtils import CustomUtils
+
 class TLGProb(object):
+
+    custom_utils = None  # ADDED [!]
 
     loaded_winning_team_model, loaded_player_models = None, {}
     best_model_rmse, correct_distribution = -1, []
@@ -69,6 +74,9 @@ class TLGProb(object):
                         self.player_dict[h].append(pos)
                     else:
                         self.player_dict[h].append(str(v))
+
+        self.custom_utils = CustomUtils(player_dict=self.player_dict)  # ADDED [!]
+
         for year_dir in next(os.walk(dir_path))[1]:
             year = 2000 + int(year_dir[-2:])
             print("loading players CSV in", year, "......")
@@ -137,7 +145,7 @@ class TLGProb(object):
             min_date_diff = [21000000, 21000001]
             for row in reader:
                 for h, v in zip(headers, row):
-                    if(float(row[2]) < 0):
+                    if(float(row[2]) < 0):  # se il punteggio è negativo lo aggiunge ai "coming_game_dict"
                         if(h == "date"):
                             self.coming_game_dict[h].append(list(map(int, v.split("-"))))
                             yeari, monthi, dayi = self.coming_game_dict[h][-1]
@@ -241,7 +249,10 @@ class TLGProb(object):
         print("Extracted Featrues are smoothed!")
 
     def generate_next_prediction(self):
-        output_str = "="*109+"\r\n"
+        prediction_result = []
+
+        output_str = "\n" + " "*44+"FUTURE PREDICTIONS"+"\r\n\n"
+        output_str += "="*109+"\r\n"
         output_str += " "*44+"PREDICTOR ACCURACIES"+"\r\n"
         output_str += "="*109+"\r\n\t"
         year1, month1, day1 = self.coming_game_date[0]
@@ -266,21 +277,26 @@ class TLGProb(object):
         output_str += "="*109+"\r\n"
         output_str += " "*34+"PREDICTION OF WINNING TEAMS ON %d/%d/%d"%(day1, month1, year1)+"\r\n"
         output_str += "="*109+"\r\n\t\t"
-        output_str +="\tWinnning Team\t\tWinnning Probability\t\tPoints Differential 95% C.I.\r\n"
+        output_str +="\tMatch\t\tWinnning Team\t\tWinnning Probability\t\tPoints Differential 95% C.I.\r\n"
         for team1, team2 in self.coming_game_match[0]:
             output_str += team1+" VS "+team2+"\t\t"
             pred_win_team, prob, y_pred, y_std = self.predict_match(team1, team2, year1, month1, day1)
+            prediction_result.append((year1, month1, day1, team1, team2, pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std))
             output_str += "%s\t\t\t%.3f\t\t\t\t[%.3f, %.3f]\r\n"%(pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std)
         output_str += "="*109+"\r\n"
         output_str += " "*34+"PREDICTION OF WINNING TEAMS ON %d/%d/%d"%(day2, month2, year2)+"\r\n"
         output_str += "="*109+"\r\n\t\t"
-        output_str +="\tWinnning Team\t\tWinnning Probability\t\tPoints Differential 95% C.I.\r\n"
+        output_str +="\tMatch\t\tWinnning Team\t\tWinnning Probability\t\tPoints Differential 95% C.I.\r\n"
         for team1, team2 in self.coming_game_match[1]:
             output_str += team1+" VS "+team2+"\t\t"
+            if team1 not in self.team_to_player[year2 + 1 if month2 > 8 else year2]:
+                output_str += "Prediction skipped - Team " + team1 + " not known before match's date " + str(year2) + "-" + str(month2) + "-" + str(day2) + "\n"
+                continue
             pred_win_team, prob, y_pred, y_std = self.predict_match(team1, team2, year2, month2, day2)
+            prediction_result.append((year2, month2, day2, team1, team2, pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std))
             output_str += "%s\t\t\t%.3f\t\t\t\t[%.3f, %.3f]\r\n"%(pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std)
         print(output_str)
-        return output_str
+        return prediction_result
 
     def eval_accuracy_by_date(self, year, month, day,
         test_nums=[20, 50, 100], regression_methods=["SSGPR", "SSGPR"]):
@@ -331,11 +347,19 @@ class TLGProb(object):
                     "= %.3f"%(count_correct[j]*1./(count_incorrect[j]+count_correct[j])))
         return count_reject, count_correct, count_incorrect
 
-    def eval_accuracy(self, eval_season=None, threshold=0.5, regression_methods=["SSGPR", "SSGPR"]):
+    # ADDED [!] param "test_set"
+    def eval_accuracy(self, eval_season=None, threshold=0.5, regression_methods=["SSGPR", "SSGPR"], test_set=None):
         self.eval_results = []
         self.load_player_models(regression_methods[0])  
         self.load_winning_team_model(regression_methods[1])
         self.correct_distribution, self.incorrect_distribution = [], []
+
+        # ADDED [!] - START
+        is_custom_test_set = False if test_set is None else True
+        if is_custom_test_set:
+            self.game_dict = test_set.copy()
+        # ADDED [!] - END
+
         test_size = len(self.game_dict["team1"])
         count_reject, count_correct, count_incorrect = 0, 0, 0
         for i in range(test_size):
@@ -382,7 +406,7 @@ class TLGProb(object):
                 csv_writer.writeheader()
             csv_dict = dict.fromkeys(headers)
             from datetime import datetime
-            csv_dict[headers[0]] = datetime.today().strftime("%Y-%m-%d")
+            csv_dict[headers[0]] = datetime.today().strftime("%Y-%m-%d %H:%M:%S") # MODIFIED [!] (added timestamp)
             csv_dict[headers[1]] = self.loaded_winning_team_model.regression_method+"-"+self.loaded_winning_team_model.hashed_name
             csv_dict[headers[2]] = self.loaded_player_models["C"].regression_method+"-"+self.loaded_player_models["C"].hashed_name
             csv_dict[headers[3]] = self.loaded_player_models["F"].regression_method+"-"+self.loaded_player_models["F"].hashed_name
@@ -434,7 +458,7 @@ class TLGProb(object):
 
     def predict_match(self, team1, team2, year, month, day,
         threshold=0.5, regression_methods=["SSGPR", "SSGPR"]):
-        assert (team1 in self.all_team and team2 in self.all_team), "Unknown Team Name!"
+        assert (team1 in self.all_team and team2 in self.all_team), "Unknown Team Name! ('" + team1 + "' or '" + team2 +"')"
         X = self.get_winning_team_model_input(team1, team2, year, month, day)
         y_pred, y_std = self.loaded_winning_team_model.predict(X)
         y_pred, y_std = np.double(y_pred), np.double(y_std)
@@ -503,6 +527,7 @@ class TLGProb(object):
 
     def get_team_players_by_date(self, team, year, month, day, num_of_players=10):
         players = self.team_to_player[year+1 if month > 8 else year][team]
+        # Salva una priorità per ogni giocatore
         date_int = year*10000 + month*100 + day
         players_priority = {}
         for p in players:
@@ -522,16 +547,18 @@ class TLGProb(object):
         count_position = {pos:0 for pos in self.all_position}
         for p in predicted_players:
             count_position[self.player_to_position[p]] += 1
-        if(min(count_position.values()) == 0):
+        # ADDED [!] disabled count_position check (allow exists one position with zero players, but always having 10 players per match -> fix next)
+        '''if(min(count_position.values()) == 0):
+            # Se un ruolo ha zero giocatori: prova a recuperare un giocatore della squadra con il ruolo mancante.
             missed_pos = min(count_position, key=count_position.get)
             find_player = list(set(self.position_to_player[missed_pos]).intersection(set(dict(sorted_players).keys())))
             if(len(find_player) == 0):
-                print(missed_pos, team, year, month, day, players)
+                print("MISSING ROLE:",missed_pos, team, year, month, day, players)
                 for p in predicted_players:
                     print(p, self.player_to_position[p], end=" ")
                 sys.exit()
             predicted_players.pop()
-            predicted_players.append(find_player[0])
+            predicted_players.append(find_player[0])'''
         return predicted_players
 
     def get_player_date_id_by_date(self, player, year, month, day):
@@ -630,8 +657,15 @@ class TLGProb(object):
         sum_F_scores, sum_F_weights = 0, 0
         sum_G_scores, sum_G_weights = 0, 0
         sorted_scores = []
+
+        # ADDED
+        player_positions = self.custom_utils.remapping_player_positions(match_players=players,
+                                                                        player_to_position_all_players=self.player_to_position,
+                                                                        team=team1, year=year, month=month, day=day)
+
         for player in players:
-            pos = self.player_to_position[player]
+            # pos = self.player_to_position[player]
+            pos = player_positions[player]  # ADDED
             date_id = self.get_player_date_id_by_date(player, year, month, day)
             if(train):
                 score_pred = self.player_to_attributes[player]["smoothed_plus_minus"][date_id]
@@ -662,8 +696,15 @@ class TLGProb(object):
         sum_F_scores, sum_F_weights = 0, 0
         sum_G_scores, sum_G_weights = 0, 0
         sorted_scores = []
+
+        # ADDED
+        player_positions = self.custom_utils.remapping_player_positions(match_players=players,
+                                                                        player_to_position_all_players=self.player_to_position,
+                                                                        team=team2, year=year, month=month, day=day)
+
         for player in players:
-            pos = self.player_to_position[player]
+            # pos = self.player_to_position[player]
+            pos = player_positions[player]  # ADDED
             date_id = self.get_player_date_id_by_date(player, year, month, day)
             score_pred = self.player_to_attributes[player]["smoothed_plus_minus"][date_id]
             weight = self.player_to_attributes[player]["smoothed_team_participation"][date_id]
@@ -688,15 +729,24 @@ class TLGProb(object):
 
     def get_winning_team_model_dataset(self, regression_method="SSGPR"):
         print("Generating Training and Testing Dataset For Winning Team Model......")
-        n = len(self.game_dict["team1"]) - 200
+        #n = len(self.game_dict["team1"]) - 200  # Ultime 200 gare
+        n = len(self.game_dict["team1"])  # ADDED (prova)
+
         self.load_player_models(regression_method)
         X, y = None, None
+
         for i in range(n):
-            team1 = self.game_dict["team1"][i+200]
+            '''team1 = self.game_dict["team1"][i+200]
             team2 = self.game_dict["team2"][i+200]
             team1pts = self.game_dict["team1pts"][i+200]
             team2pts = self.game_dict["team2pts"][i+200]
-            year, month, day = self.game_dict["date"][i+200]
+            year, month, day = self.game_dict["date"][i+200]'''
+            # ADDED (prova)
+            team1 = self.game_dict["team1"][i]
+            team2 = self.game_dict["team2"][i]
+            team1pts = self.game_dict["team1pts"][i]
+            team2pts = self.game_dict["team2pts"][i]
+            year, month, day = self.game_dict["date"][i]
             print("Get -> ", team1, "vs", team2, "on", year, month, day)
             x_i = self.get_winning_team_model_input(team1, team2, year, month, day, True)
             y_i = np.array([[team1pts-team2pts]])
@@ -725,10 +775,6 @@ class TLGProb(object):
     
     def train_regression(self, X, y, model_path, best_model_path, regression_method):
         #print("[train_regression] model_path = "+model_path+", best_model_path = "+best_model_path+", regression_method = "+regression_method)
-        #print("X = ")
-        #print(X)
-        #print("y = ")
-        #print(y)
         import glob
         import random
         from sklearn.model_selection import GridSearchCV

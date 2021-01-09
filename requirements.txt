@@ -5,3 +5,10 @@ nose
 coverage
 pypi-publisher
 sklearn
+numpy
+scipy
+SSGP
+setuptools
+selenium
+future
+pandas
