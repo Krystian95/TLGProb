@@ -1,0 +1,178 @@
+date,team1,team1pts,team2,team2pts
+2019-09-24,Pesaro,72,"Fortitudo Bologna",80
+2019-09-25,Trentino,88,Pistoia,75
+2019-09-25,"Virtus Bologna",74,Roma,67
+2019-09-25,Brescia,90,"Reggio Emilia",82
+2019-09-26,Venezia,78,Trieste,73
+2019-09-26,Brindisi,64,Cantù,69
+2019-09-26,Varese,52,Sassari,74
+2019-09-26,Treviso,53,Milano,75
+2019-09-28,"Reggio Emilia",76,Trentino,84
+2019-09-29,Milano,65,Brescia,73
+2019-09-29,Roma,63,Brindisi,87
+2019-09-29,Sassari,99,Pesaro,79
+2019-09-29,Pistoia,78,"Virtus Bologna",88
+2019-09-29,"Fortitudo Bologna",89,Venezia,82
+2019-09-29,Cremona,89,Treviso,87
+2019-09-29,Trieste,62,Varese,92
+2019-10-05,Trentino,73,Sassari,76
+2019-10-05,Brindisi,88,Brescia,78
+2019-10-06,Milano,88,Trieste,73
+2019-10-06,Roma,97,Cremona,94
+2019-10-06,Varese,83,"Fortitudo Bologna",60
+2019-10-06,Cantù,75,"Reggio Emilia",92
+2019-10-06,Treviso,87,Pistoia,72
+2019-10-06,"Virtus Bologna",75,Venezia,70
+2019-10-12,Pistoia,67,Roma,81
+2019-10-13,Sassari,59,Trieste,65
+2019-10-13,Venezia,76,Cantù,46
+2019-10-13,Milano,89,Brindisi,92
+2019-10-13,Brescia,92,Trentino,66
+2019-10-13,"Reggio Emilia",85,Cremona,71
+2019-10-13,Pesaro,79,"Virtus Bologna",94
+2019-10-13,"Fortitudo Bologna",77,Treviso,69
+2019-10-19,"Virtus Bologna",87,Varese,80
+2019-10-19,Trieste,76,Brescia,74
+2019-10-19,Treviso,90,Venezia,79
+2019-10-20,Cremona,82,Milano,78
+2019-10-20,Roma,79,"Fortitudo Bologna",65
+2019-10-20,Cantù,78,Trentino,72
+2019-10-20,"Reggio Emilia",84,Pistoia,72
+2019-10-20,Brindisi,108,Pesaro,99
+2019-10-26,Trentino,76,Treviso,71
+2019-10-26,Brescia,80,"Virtus Bologna",82
+2019-10-26,Venezia,67,Cremona,55
+2019-10-27,Roma,73,Milano,79
+2019-10-27,Varese,102,Brindisi,78
+2019-10-27,Pesaro,65,"Reggio Emilia",90
+2019-10-27,"Fortitudo Bologna",82,Pistoia,71
+2019-10-27,Cantù,70,Sassari,87
+2019-11-02,Sassari,108,Roma,72
+2019-11-03,Brindisi,75,Venezia,71
+2019-11-03,"Reggio Emilia",59,"Virtus Bologna",79
+2019-11-03,Milano,93,Varese,69
+2019-11-03,Pistoia,76,Trieste,72
+2019-11-03,Treviso,85,Pesaro,75
+2019-11-03,"Fortitudo Bologna",74,Brescia,88
+2019-11-03,Cremona,54,Cantù,78
+2019-11-09,Pesaro,95,Trentino,101
+2019-11-10,Brescia,91,Varese,74
+2019-11-10,Cantù,74,Roma,76
+2019-11-10,Trieste,72,Brindisi,80
+2019-11-10,"Virtus Bologna",84,Treviso,79
+2019-11-10,Cremona,80,"Fortitudo Bologna",73
+2019-11-10,Venezia,55,Sassari,54
+2019-11-11,Milano,83,Pistoia,63
+2019-11-16,Sassari,100,"Reggio Emilia",81
+2019-11-17,Trentino,79,Cremona,89
+2019-11-17,Varese,93,Venezia,91
+2019-11-17,Treviso,72,Brescia,68
+2019-11-17,Trieste,85,"Virtus Bologna",89
+2019-11-17,"Fortitudo Bologna",85,Milano,80
+2019-11-17,Pistoia,77,Cantù,69
+2019-11-17,Roma,92,Pesaro,83
+2019-11-23,"Reggio Emilia",81,Varese,74
+2019-11-24,Milano,90,Sassari,78
+2019-11-24,Cremona,88,Trieste,78
+2019-11-24,Brescia,101,Pesaro,74
+2019-11-24,Brindisi,100,Pistoia,67
+2019-11-24,Roma,69,Treviso,81
+2019-11-24,Venezia,79,Trentino,69
+2019-11-24,Cantù,82,"Fortitudo Bologna",84
+2019-11-30,Trentino,78,Brindisi,67
+2019-12-01,Varese,99,Roma,69
+2019-12-01,Trieste,69,Treviso,61
+2019-12-01,Pistoia,89,Venezia,87
+2019-12-01,Sassari,76,Brescia,70
+2019-12-01,Milano,89,"Reggio Emilia",78
+2019-12-01,Pesaro,63,Cremona,74
+2019-12-01,"Virtus Bologna",89,Cantù,70
+2019-12-07,"Fortitudo Bologna",93,Trentino,68
+2019-12-08,Brescia,86,Pistoia,74
+2019-12-08,Pesaro,65,Milano,71
+2019-12-08,Brindisi,77,Sassari,83
+2019-12-08,Cantù,74,Varese,67
+2019-12-08,Cremona,78,"Virtus Bologna",66
+2019-12-08,Treviso,91,"Reggio Emilia",83
+2019-12-08,Roma,82,Trieste,72
+2019-12-14,Trentino,82,Roma,88
+2019-12-14,"Virtus Bologna",99,Brindisi,87
+2019-12-15,Sassari,86,"Fortitudo Bologna",80
+2019-12-15,Venezia,70,Milano,71
+2019-12-15,"Reggio Emilia",87,Trieste,86
+2019-12-15,Varese,103,Pesaro,87
+2019-12-15,Cantù,77,Treviso,74
+2019-12-15,Pistoia,84,Cremona,71
+2019-12-21,Cremona,93,Varese,72
+2019-12-22,Pistoia,91,Pesaro,79
+2019-12-22,Sassari,91,"Virtus Bologna",77
+2019-12-22,"Fortitudo Bologna",78,Brindisi,72
+2019-12-22,Milano,81,Trentino,69
+2019-12-22,"Reggio Emilia",85,Venezia,104
+2019-12-22,Trieste,86,Cantù,96
+2019-12-22,Roma,53,Brescia,83
+2019-12-25,"Virtus Bologna",94,"Fortitudo Bologna",62
+2019-12-26,Pesaro,72,Cantù,87
+2019-12-26,Varese,91,Pistoia,60
+2019-12-26,Venezia,79,Roma,77
+2019-12-26,Brescia,91,Cremona,76
+2019-12-26,Brindisi,87,"Reggio Emilia",72
+2019-12-26,Trentino,80,Trieste,53
+2019-12-27,Treviso,79,Sassari,101
+2019-12-29,Cantù,82,Brescia,93
+2019-12-29,"Virtus Bologna",83,Milano,70
+2019-12-29,Varese,81,Trentino,86
+2019-12-29,Trieste,89,"Fortitudo Bologna",69
+2019-12-29,Venezia,98,Pesaro,92
+2019-12-29,"Reggio Emilia",96,Roma,88
+2019-12-29,Brindisi,81,Treviso,74
+2019-12-30,Sassari,84,Cremona,74
+2020-01-04,Brescia,70,Venezia,64
+2020-01-04,Pistoia,70,Sassari,78
+2020-01-05,Cremona,93,Brindisi,89
+2020-01-05,Milano,83,Cantù,89
+2020-01-05,Trentino,77,"Virtus Bologna",83
+2020-01-05,Pesaro,76,Trieste,82
+2020-01-05,Treviso,79,Varese,84
+2020-01-05,"Fortitudo Bologna",86,"Reggio Emilia",69
+2020-01-11,"Reggio Emilia",81,Brescia,87
+2020-01-11,"Fortitudo Bologna",77,Pesaro,80
+2020-01-12,Milano,91,Treviso,67
+2020-01-12,Roma,68,"Virtus Bologna",97
+2020-01-12,Cantù,92,Brindisi,93
+2020-01-12,Trieste,72,Venezia,81
+2020-01-12,Sassari,93,Varese,87
+2020-01-12,Pistoia,71,Trentino,74
+2020-01-18,Trentino,81,"Reggio Emilia",103
+2020-01-18,Treviso,84,Cremona,94
+2020-01-18,"Virtus Bologna",90,Pistoia,60
+2020-01-18,Venezia,80,"Fortitudo Bologna",70
+2020-01-19,Varese,91,Trieste,85
+2020-01-19,Brindisi,88,Roma,81
+2020-01-19,Pesaro,82,Sassari,107
+2020-01-19,Brescia,78,Milano,72
+2020-01-25,Sassari,87,Trentino,90
+2020-01-25,Venezia,71,"Virtus Bologna",83
+2020-01-25,"Reggio Emilia",85,Cantù,73
+2020-01-26,Brescia,82,Brindisi,86
+2020-01-26,Cremona,103,Roma,92
+2020-01-26,Trieste,67,Milano,85
+2020-01-26,Pistoia,75,Treviso,86
+2020-01-26,"Fortitudo Bologna",79,Varese,76
+2020-02-01,Brindisi,74,Milano,77
+2020-02-01,"Virtus Bologna",106,Pesaro,89
+2020-02-02,Cantù,81,Venezia,77
+2020-02-02,Trentino,63,Brescia,56
+2020-02-02,Roma,80,Pistoia,81
+2020-02-02,Trieste,83,Sassari,82
+2020-02-02,Treviso,78,"Fortitudo Bologna",66
+2020-02-02,Cremona,95,"Reggio Emilia",93
+2020-02-08,"Fortitudo Bologna",95,Roma,92
+2020-02-09,Pesaro,77,Brindisi,103
+2020-02-09,Milano,77,Cremona,74
+2020-02-09,Trentino,79,Cantù,71
+2020-02-09,Venezia,79,Treviso,73
+2020-02-09,Brescia,76,Trieste,74
+2020-02-09,Pistoia,86,"Reggio Emilia",79
+2020-03-07,Trieste,97,Pistoia,80
+2020-03-07,Roma,88,Sassari,93

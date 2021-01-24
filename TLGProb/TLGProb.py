@@ -256,7 +256,8 @@ class TLGProb(object):
         output_str += " "*44+"PREDICTOR ACCURACIES"+"\r\n"
         output_str += "="*109+"\r\n\t"
         year1, month1, day1 = self.coming_game_date[0]
-        year2, month2, day2 = self.coming_game_date[1]
+        if len(self.coming_game_date[1]) > 0:  # ADDED
+            year2, month2, day2 = self.coming_game_date[1]
         pred_accur_test = [50, 100, 200]
         estimators = ["PLUS/MINUS"]
         pred_accur = {}
@@ -277,24 +278,25 @@ class TLGProb(object):
         output_str += "="*109+"\r\n"
         output_str += " "*34+"PREDICTION OF WINNING TEAMS ON %d/%d/%d"%(day1, month1, year1)+"\r\n"
         output_str += "="*109+"\r\n\t\t"
-        output_str +="\tMatch\t\tWinnning Team\t\tWinnning Probability\t\tPoints Differential 95% C.I.\r\n"
+        output_str +="\tMatch\t\tWinning Team\t\tWinning Probability\t\tPoints Differential 95% C.I.\r\n"
         for team1, team2 in self.coming_game_match[0]:
             output_str += team1+" VS "+team2+"\t\t"
             pred_win_team, prob, y_pred, y_std = self.predict_match(team1, team2, year1, month1, day1)
             prediction_result.append((year1, month1, day1, team1, team2, pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std))
             output_str += "%s\t\t\t%.3f\t\t\t\t[%.3f, %.3f]\r\n"%(pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std)
-        output_str += "="*109+"\r\n"
-        output_str += " "*34+"PREDICTION OF WINNING TEAMS ON %d/%d/%d"%(day2, month2, year2)+"\r\n"
-        output_str += "="*109+"\r\n\t\t"
-        output_str +="\tMatch\t\tWinnning Team\t\tWinnning Probability\t\tPoints Differential 95% C.I.\r\n"
-        for team1, team2 in self.coming_game_match[1]:
-            output_str += team1+" VS "+team2+"\t\t"
-            if team1 not in self.team_to_player[year2 + 1 if month2 > 8 else year2]:
-                output_str += "Prediction skipped - Team " + team1 + " not known before match's date " + str(year2) + "-" + str(month2) + "-" + str(day2) + "\n"
-                continue
-            pred_win_team, prob, y_pred, y_std = self.predict_match(team1, team2, year2, month2, day2)
-            prediction_result.append((year2, month2, day2, team1, team2, pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std))
-            output_str += "%s\t\t\t%.3f\t\t\t\t[%.3f, %.3f]\r\n"%(pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std)
+        if len(self.coming_game_date[1]) > 0:  # ADDED
+            output_str += "="*109+"\r\n"
+            output_str += " "*34+"PREDICTION OF WINNING TEAMS ON %d/%d/%d"%(day2, month2, year2)+"\r\n"
+            output_str += "="*109+"\r\n\t\t"
+            output_str +="\tMatch\t\tWinning Team\t\tWinning Probability\t\tPoints Differential 95% C.I.\r\n"
+            for team1, team2 in self.coming_game_match[1]:
+                output_str += team1+" VS "+team2+"\t\t"
+                if team1 not in self.team_to_player[year2 + 1 if month2 > 8 else year2]:
+                    output_str += "Prediction skipped - Team " + team1 + " not known before match's date " + str(year2) + "-" + str(month2) + "-" + str(day2) + "\n"
+                    continue
+                pred_win_team, prob, y_pred, y_std = self.predict_match(team1, team2, year2, month2, day2)
+                prediction_result.append((year2, month2, day2, team1, team2, pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std))
+                output_str += "%s\t\t\t%.3f\t\t\t\t[%.3f, %.3f]\r\n"%(pred_win_team, prob, y_pred-1.96*y_std, y_pred+1.96*y_std)
         print(output_str)
         return prediction_result
 
@@ -392,7 +394,7 @@ class TLGProb(object):
                     count_incorrect += 1
                     self.incorrect_distribution.append(prob)
                 print("Current accuracy =", (count_correct*1./(count_correct+count_incorrect)))
-        print("We have", count_reject, "rejections,",\
+        print("\nWe have", count_reject, "rejections,",\
             count_correct, "correct prediction and,",\
             count_incorrect, "incorrect prediction.")
         file_dir = os.path.dirname(os.path.realpath('__file__'))
@@ -415,7 +417,7 @@ class TLGProb(object):
             csv_dict[headers[6]] = count_reject
             csv_dict[headers[7]] = count_correct
             csv_dict[headers[8]] = count_incorrect
-            csv_dict[headers[9]] = (count_correct*1./(count_correct+count_incorrect))
+            csv_dict[headers[9]] = 0 if (count_correct+count_incorrect) == 0 else (count_correct*1./(count_correct+count_incorrect))
             csv_writer.writerow(csv_dict)
         return self.eval_results
 
@@ -722,8 +724,10 @@ class TLGProb(object):
                 sum_G_weights += weight
         sorted_scores = sorted(sorted_scores, key=lambda x:x[1], reverse=True)[:6]
         tx = [ss[0] for ss in sorted_scores]
-        tx.extend([sum_all_scores/sum_weights, sum_C_scores/sum_C_weights,
-                   sum_F_scores/sum_F_weights, sum_G_scores/sum_G_weights])
+        tx.extend([0 if sum_weights == 0 else sum_all_scores/sum_weights,
+                    0 if sum_C_weights == 0 else sum_C_scores/sum_C_weights,
+                    0 if sum_F_weights == 0 else sum_F_scores/sum_F_weights,
+                    0 if sum_G_weights == 0 else sum_G_scores/sum_G_weights])
         x -= np.asarray(tx, dtype=np.float64)
         return x[None, :]
 
