@@ -689,8 +689,10 @@ class TLGProb(object):
                 sum_G_weights += weight
         sorted_scores = sorted(sorted_scores, key=lambda x:x[1], reverse=True)[:6]
         tx = [ss[0] for ss in sorted_scores]
-        tx.extend([sum_all_scores/sum_weights, sum_C_scores/sum_C_weights,
-                   sum_F_scores/sum_F_weights, sum_G_scores/sum_G_weights])
+        tx.extend([0 if sum_weights == 0 else sum_all_scores / sum_weights,
+                   0 if sum_C_weights == 0 else sum_C_scores / sum_C_weights,
+                   0 if sum_F_weights == 0 else sum_F_scores / sum_F_weights,
+                   0 if sum_G_weights == 0 else sum_G_scores / sum_G_weights])
         x = np.asarray(tx, dtype=np.float64)
         players = self.get_team_players_by_date(team2, year, month, day)
         sum_all_scores, sum_weights = 0, 0

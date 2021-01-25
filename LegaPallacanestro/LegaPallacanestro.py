@@ -19,7 +19,7 @@ database = mysql.connector.connect(
     host="localhost",
     user="root",
     password="root",
-    database="progetto_ai",
+    database="progetto_ai_2",
     auth_plugin='mysql_native_password'
 )
 
@@ -63,7 +63,7 @@ def generate_single_players_stats(stagione_sportiva, fino_a_giornata_index=None)
                                 giornate=giornate_input)
 
 
-stagioni_sportive = ['2017/2018', '2018/2019']
+stagioni_sportive = ['2018/2019', '2019/2020']
 
 all_games = pd.DataFrame(get_all_games())
 all_games["date"] = all_games["date"].astype(str)
