@@ -14,12 +14,13 @@ pd.set_option('display.max_columns', 50)
 pd.set_option('display.width', 1000)
 
 prediction_timestamp = str(datetime.timestamp(datetime.now()))
+print("prediction_timestamp =", prediction_timestamp)
 
 database = mysql.connector.connect(
     host="localhost",
     user="root",
     password="root",
-    database="progetto_ai_2",
+    database="progetto_ai_3",
     auth_plugin='mysql_native_password'
 )
 
@@ -63,13 +64,13 @@ def generate_single_players_stats(stagione_sportiva, fino_a_giornata_index=None)
                                 giornate=giornate_input)
 
 
-stagioni_sportive = ['2018/2019', '2019/2020']
+stagioni_sportive = ['2017/2018', '2018/2019']
 
 all_games = pd.DataFrame(get_all_games())
 all_games["date"] = all_games["date"].astype(str)
 
 previous_season_games = all_games.loc[all_games['StagioneSportiva'] == stagioni_sportive[0]].iloc[:, :5]
-# previous_season_games = all_games.loc[(all_games['StagioneSportiva'] == '2016/2017') | (all_games['StagioneSportiva'] == '2017/2018') | (all_games['StagioneSportiva'] == '2018/2019')].iloc[:, :5]
+#previous_season_games = all_games.loc[(all_games['StagioneSportiva'] == '2013/2014') | (all_games['StagioneSportiva'] == '2014/2015') | (all_games['StagioneSportiva'] == '2015/2016') | (all_games['StagioneSportiva'] == '2016/2017') | (all_games['StagioneSportiva'] == '2017/2018')].iloc[:, :5]
 training_games = previous_season_games.copy()
 current_season_games = all_games.loc[all_games['StagioneSportiva'] == stagioni_sportive[1]]
 
@@ -106,8 +107,11 @@ for i in range(len(giornate)-1):
     # Delete trained models
     shutil.rmtree("Predictor/trained_models", ignore_errors=True)
 
+    iteration_timestamp = str(datetime.timestamp(datetime.now()))
+    print("iteration_timestamp =", iteration_timestamp)
+
     predictor.load_data()
-    predictor.train_player_models()
+    predictor.train_player_models(iteration_timestamp=iteration_timestamp)
     predictor.train_winning_team_model()
 
     # Prediction dataset
@@ -150,8 +154,10 @@ for i in range(len(giornate)-1):
     for index, row in prediction_evaluation.iterrows():
         if pd.isnull(row["Pred Winning Team"]) or row["Pred Winning Team"] == "---":
             continue
+
         real_winner = row["team1"] if int(row["team1pts"]) > int(row["team2pts"]) else row["team2"]
         prediction_evaluation.loc[index, "correct_winning"] = True if row["Pred Winning Team"] == real_winner else False
+
         if row["Winning Probability"] < 0.70:
             prediction_evaluation.loc[index, "Predicted_Difficulty"] = 2
         elif 0.70 <= row["Winning Probability"] < 0.8:

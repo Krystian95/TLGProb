@@ -1,7 +1,17 @@
-from operator import itemgetter
+import mysql.connector
+from datetime import datetime
 
 
 class CustomUtils:
+    database = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="root",
+        database="progetto_ai",
+        auth_plugin='mysql_native_password'
+    )
+    teams_compositions = []
+
     player_informations = []
     player_names_ordered_by_height = []
 
@@ -34,7 +44,8 @@ class CustomUtils:
             position_to_player["F"].remove(new_center)
             position_to_player["C"].append(new_center)
             # print(player_positions)
-            print("(!) Detected no Centers for", team, "on", year, month, day, ": " + new_center, "was temporarily moved from F to C")
+            print("(!) Detected no Centers for", team, "on", year, month, day, ": " + new_center,
+                  "was temporarily moved from F to C")
 
         for position in position_to_player:
             # print(position)
@@ -43,3 +54,22 @@ class CustomUtils:
                 # print(position_to_player[position][i])
 
         return player_to_position
+
+    def save_team_composition(self, year, month, day, team, player, pos, iteration_timestamp, match):
+        tuple = (iteration_timestamp, match, str(year) + "-" + str(month) + "-" + str(day), team, player, pos)
+        self.teams_compositions.append(tuple) if tuple not in self.teams_compositions else self.teams_compositions
+        #print(self.teams_compositions)
+
+    def insert_teams_compositions_to_db(self):
+        cursor = self.database.cursor()
+        query = """
+                INSERT INTO team_composition (
+                    generated_timestamp,
+                    match_description,
+                    match_date,
+                    team,
+                    player,
+                    position
+                ) VALUES (%s, %s, %s, %s, %s, %s)"""
+        cursor.executemany(query, self.teams_compositions)
+        self.database.commit()

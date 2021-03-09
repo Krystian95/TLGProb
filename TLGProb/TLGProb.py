@@ -18,7 +18,7 @@ from .CustomUtils import CustomUtils
 
 class TLGProb(object):
 
-    custom_utils = None  # ADDED [!]
+    custom_utils, iteration_timestamp = None, None  # ADDED [!]
 
     loaded_winning_team_model, loaded_player_models = None, {}
     best_model_rmse, correct_distribution = -1, []
@@ -93,6 +93,7 @@ class TLGProb(object):
                 break
             for player_game_csv in all_player_game_csv:
                 player = player_game_csv[:-4].replace("_", " ")
+                player = player.replace('\\xa0', ' ')
                 self.all_player.add(player)
                 self.position_to_player[self.player_to_position[player]].add(player)
                 if(player not in self.player_to_date.keys()):
@@ -230,7 +231,7 @@ class TLGProb(object):
                 new_mp_vec[t-1] = new_mp_s.copy()
                 new_performance_mat[t-1] = new_performance_vec_s.copy()
                 new_plus_minus_vec[t-1] = new_plus_minus_s.copy()
-                date_diff = min(abs(dates[t] - dates[t-1]), 6)
+                date_diff = min(abs(dates[t] - dates[t-1]), 21)
                 mp_time_weight = (1-np.exp(-1))**(date_diff/2.)
                 performance_time_weight = (1-np.exp(-1))**(date_diff/3.)
                 plus_minus_time_weight = (1-np.exp(-1))**(date_diff)
@@ -550,7 +551,7 @@ class TLGProb(object):
         for p in predicted_players:
             count_position[self.player_to_position[p]] += 1
         # ADDED [!] disabled count_position check (allow exists one position with zero players, but always having 10 players per match -> fix next)
-        '''if(min(count_position.values()) == 0):
+        if(min(count_position.values()) == 0):
             # Se un ruolo ha zero giocatori: prova a recuperare un giocatore della squadra con il ruolo mancante.
             missed_pos = min(count_position, key=count_position.get)
             find_player = list(set(self.position_to_player[missed_pos]).intersection(set(dict(sorted_players).keys())))
@@ -560,7 +561,7 @@ class TLGProb(object):
                     print(p, self.player_to_position[p], end=" ")
                 sys.exit()
             predicted_players.pop()
-            predicted_players.append(find_player[0])'''
+            predicted_players.append(find_player[0])
         return predicted_players
 
     def get_player_date_id_by_date(self, player, year, month, day):
@@ -632,7 +633,9 @@ class TLGProb(object):
         print("Training and Testing Dataset For Player Models are Generated!")
         return res
 
-    def train_player_models(self, regression_method="SSGPR"):
+    # ADDED param "iteration_timestamp"
+    def train_player_models(self, regression_method="SSGPR", iteration_timestamp=None):
+        self.iteration_timestamp = iteration_timestamp  # ADDED
         #print("[train_player_models] regression_method = "+regression_method)
         import random
         print("Start Training Player Models......")
@@ -661,13 +664,14 @@ class TLGProb(object):
         sorted_scores = []
 
         # ADDED
-        player_positions = self.custom_utils.remapping_player_positions(match_players=players,
+        '''player_positions = self.custom_utils.remapping_player_positions(match_players=players,
                                                                         player_to_position_all_players=self.player_to_position,
-                                                                        team=team1, year=year, month=month, day=day)
+                                                                        team=team1, year=year, month=month, day=day)'''
 
         for player in players:
-            # pos = self.player_to_position[player]
-            pos = player_positions[player]  # ADDED
+            pos = self.player_to_position[player]
+            #pos = player_positions[player]  # ADDED
+            if(train): self.custom_utils.save_team_composition(year, month, day, team1, player, pos, self.iteration_timestamp, team1 + " vs. " + team2)  # ADDED
             date_id = self.get_player_date_id_by_date(player, year, month, day)
             if(train):
                 score_pred = self.player_to_attributes[player]["smoothed_plus_minus"][date_id]
@@ -702,13 +706,14 @@ class TLGProb(object):
         sorted_scores = []
 
         # ADDED
-        player_positions = self.custom_utils.remapping_player_positions(match_players=players,
+        '''player_positions = self.custom_utils.remapping_player_positions(match_players=players,
                                                                         player_to_position_all_players=self.player_to_position,
-                                                                        team=team2, year=year, month=month, day=day)
+                                                                        team=team2, year=year, month=month, day=day)'''
 
         for player in players:
-            # pos = self.player_to_position[player]
-            pos = player_positions[player]  # ADDED
+            pos = self.player_to_position[player]
+            #pos = player_positions[player]  # ADDED
+            if(train): self.custom_utils.save_team_composition(year, month, day, team2, player, pos, self.iteration_timestamp, team1 + " vs. " + team2)  # ADDED
             date_id = self.get_player_date_id_by_date(player, year, month, day)
             score_pred = self.player_to_attributes[player]["smoothed_plus_minus"][date_id]
             weight = self.player_to_attributes[player]["smoothed_team_participation"][date_id]
@@ -763,6 +768,7 @@ class TLGProb(object):
                 X = np.vstack((X, x_i))
                 y = np.vstack((y, y_i))
         print("Training and Testing Dataset For Winning Team Model are Generated!")
+        self.custom_utils.insert_teams_compositions_to_db()  # ADDED
         self.winning_team_model_dataset = [X, y]
 
     def train_winning_team_model(self, regression_method="SSGPR"):
